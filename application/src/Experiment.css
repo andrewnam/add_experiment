@@ -1,0 +1,19 @@
+.Experiment {
+    text-align: center;
+    max-height: 720px;
+    width: 650px;
+    /*background: lightyellow;*/
+    /*margin: 50px auto;*/
+    /*position: relative;*/
+    padding: 25px;
+    /*margin-top: 50px;*/
+}
+
+.screen {
+    position: relative;
+    max-height: 620px;
+    width: 600px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    /*background: aliceblue;*/
+}
