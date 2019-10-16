@@ -1,6 +1,8 @@
 import * as React from 'react';
 import './Experiment.css';
 import ResponseScreen from "./screen_templates/ResponseScreen";
+import Controller from "./framework/Controller";
+import Welcome from "./screens/Welcome";
 
 class Experiment extends React.Component {
   static assignmentIdParam = 'assignmentId';
@@ -16,7 +18,7 @@ class Experiment extends React.Component {
   };
 
   screens: Array<any>;
-  // screens: Scre
+  controller: Controller;
 
   constructor(props: Readonly<{}>) {
     super(props);
@@ -24,9 +26,22 @@ class Experiment extends React.Component {
       current_screen: 0
     };
 
+    this.controller = new Controller({goToNextScreen: this.goToNextScreen.bind(this)});
     this.screens = [
-      <ResponseScreen delay={500} stimulus={'3+4'}/>
+      <Welcome controller={this.controller}/>,
+      <ResponseScreen controller={this.controller} delay={500} stimulus={'3+4'}/>
     ]
+  }
+
+  goToNextScreen() {
+    this.setState((state: any) => {return {current_screen: state.current_screen + 1}},
+      () => {
+        // this.recordNewScreen();
+        // // If the experiment is over:
+        // if (this.state.current_screen == this.screens.length - 1) {
+        //   emitHitComplete(this.onComplete);
+        // }
+      });
   }
 
   renderScreen() {

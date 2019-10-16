@@ -1,13 +1,13 @@
 import './ResponseScreen.css';
 import * as React from 'react';
 import Screen from "./Screen";
-
-
+import Controller from "../framework/Controller";
 
 class ResponseScreen extends Screen {
   props!: {
-    delay: number;
-    stimulus: string;
+    controller: Controller,
+    delay: number,
+    stimulus: string
   };
 
   state: {
