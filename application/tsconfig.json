@@ -25,9 +25,13 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "strict": true,
+    "strictPropertyInitialization": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": [
+      "node"
+    ]
   },
   "exclude": [
     "node_modules",

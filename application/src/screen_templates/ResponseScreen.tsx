@@ -7,7 +7,9 @@ class ResponseScreen extends Screen {
   props!: {
     controller: Controller,
     delay: number,
-    stimulus: string
+    stimulus: string,
+    target: string,
+    maxTypeTime?: number
   };
 
   state: {
@@ -19,6 +21,10 @@ class ResponseScreen extends Screen {
     this.state = {
       showStimulus: false
     }
+  }
+
+  handleKeyDown(key: string) {
+
   }
 
   render() {
