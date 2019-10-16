@@ -29,7 +29,10 @@ class Experiment extends React.Component {
     this.controller = new Controller({goToNextScreen: this.goToNextScreen.bind(this)});
     this.screens = [
       <Welcome controller={this.controller}/>,
-      <ResponseScreen controller={this.controller} delay={500} stimulus={'3+4'}/>
+      <ResponseScreen controller={this.controller}
+                      delay={500}
+                      stimulus={'3+4'}
+                      target={'7'}/>
     ]
   }
 
