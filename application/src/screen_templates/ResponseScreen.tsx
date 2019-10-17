@@ -2,8 +2,10 @@ import './ResponseScreen.css';
 import * as React from 'react';
 import Screen from "./Screen";
 import Controller from "../framework/Controller";
-import {timer} from "../utils";
+import {clear_timer, timer} from "../utils";
 import {Datatype} from "../framework/Datastore";
+import AppSettings from "../AppSettings";
+// import AppSettings from "../AppSettings";
 
 class ResponseScreen extends Screen {
   timer_period = 25;
@@ -25,6 +27,7 @@ class ResponseScreen extends Screen {
   stimulusTimestamp: Date | null;
   responseStartTimestamp: Date | null;
   response: string;
+  maxTimerKey: number | null;
 
   constructor(props: any) {
     super(props);
@@ -34,11 +37,14 @@ class ResponseScreen extends Screen {
     this.stimulusTimestamp = null;
     this.responseStartTimestamp = null;
     this.response = '';
+    this.maxTimerKey = null;
   }
 
   handleKeyDown(key: string) {
     const timestamp = new Date();
     if (this.state.showStimulus){
+      clear_timer(this.maxTimerKey!);
+
       if (this.responseStartTimestamp == null) {
         this.responseStartTimestamp = timestamp;
         timer(this.props.maxTypeTime, this.timer_period, this.submitResponse.bind(this)
@@ -64,7 +70,6 @@ class ResponseScreen extends Screen {
       value: this.response
     });
     this.props.appendResult(this.response == this.props.target);
-    console.log(this.props.controller.datastore.data);
     this.props.controller.functions.goToNextScreen();
   }
 
@@ -78,9 +83,18 @@ class ResponseScreen extends Screen {
       value: this.props.delay
     });
 
+    // Basically, need to kill the timeout timer once a keystroke is made
     timer(this.props.delay, this.timer_period, (() => {
       this.setState({showStimulus: true},
-        () => {this.stimulusTimestamp = new Date()});
+        () => {
+        this.stimulusTimestamp = new Date();
+        const currentScreen = this.props.controller.functions.getCurrentScreen();
+        this.maxTimerKey = timer(AppSettings.maxTrialTime, 200, (() => {
+          if (this.props.controller.functions.getCurrentScreen() == currentScreen) {
+            this.props.controller.functions.goToNextScreen()
+          }
+        }).bind(this));
+      });
     }).bind(this));
   }
 

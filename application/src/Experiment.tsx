@@ -7,6 +7,7 @@ import InstructionScreen from "./screen_templates/InstructionScreen";
 import AppSettings from './AppSettings';
 import {randInt, toUSD} from "./utils";
 import RewardSummaryScreen from "./screen_templates/RewardSummaryScreen";
+import DemographicSurvey from "./screens/DemographicSurvey";
 const _ = require('lodash');
 
 
@@ -32,12 +33,19 @@ class Experiment extends React.Component {
       current_screen: 0
     };
 
-    this.controller = new Controller({goToNextScreen: this.goToNextScreen.bind(this)});
+    this.controller = new Controller({
+      goToNextScreen: this.goToNextScreen.bind(this),
+      getCurrentScreen: (() => this.state.current_screen).bind(this)
+    });
     this.screens = [];
+
 
     this.addInstructions();
     this.addDemonstrationPhase(AppSettings.maxAddend, AppSettings.numDemonstrationTrials);
-    this.addCallibrationPhase(AppSettings.maxAddend, AppSettings.numCallibrationSets);
+    // this.addCalibrationPhase(AppSettings.maxAddend, AppSettings.numCalibrationSets);
+    this.addCalibrationPhase(5, 1);
+    this.addAdd2Phase(AppSettings.maxAddend, AppSettings.numAdd2Split, AppSettings.numWarmupTrials);
+    this.addScreen(DemographicSurvey, 'demographic_survey')
   }
 
   addScreen(screen: ComponentClass<any>, screenName: string, props?: object) {
@@ -52,7 +60,7 @@ class Experiment extends React.Component {
   }
 
   addInstructions() {
-    this.addScreen(InstructionScreen, 'Instructions', {
+    this.addScreen(InstructionScreen, 'inst_welcome', {
       instructions: ['In this experiment, you will be shown a series of numbers and simple math problems.' +
         ' Please type the value of the expression shown.',
         'For example, if the screen shows 7, enter 7. If the screen shows 3 + 13, enter 16.']
@@ -60,33 +68,47 @@ class Experiment extends React.Component {
 
     const numAddProblems = (1+AppSettings.maxAddend) * (1+AppSettings.maxAddend);
     const numTypeProblems = AppSettings.numDemonstrationTrials +
-      (AppSettings.maxAddend+1)*AppSettings.numCallibrationSets +
-      AppSettings.numWarmupTrials*AppSettings.numAdd2Split;
+      (AppSettings.maxAddend+1)*AppSettings.numCalibrationSets +
+      AppSettings.numWarmupTrials*(1+AppSettings.numAdd2Split);
     const totalProblems = numTypeProblems + numAddProblems;
 
-    this.addScreen(InstructionScreen, 'Compensation', {
+    this.addScreen(InstructionScreen, 'inst_compensation', {
       instructions: [`You will receive ${toUSD(AppSettings.correctReward)} for each correct response and
        ${toUSD(AppSettings.incorrectReward)} for each incorrect response. There will be ${numTypeProblems} Type
        problems and ${numAddProblems} for a maximum compensation of
        ${toUSD(totalProblems*AppSettings.correctReward)}.`]
     });
 
-    this.addScreen(InstructionScreen, 'Details', {
+    this.addScreen(InstructionScreen, 'inst_details', {
       instructions: [`Please response and type quickly. The program will proceed soon after the first entered key.
        You will receive ${AppSettings.numAdd2Split} breaks during the experiment.`]
     });
   }
 
+  addWarmup(phase: string, resultsArray: Array<boolean>, maxNumber: number, numTrials: number) {
+    for (let i = 0; i < numTrials; i++) {
+      let screenName = phase + '_warmup_' + i;
+      let stimulus = randInt(maxNumber).toString();
+      this.addScreen(ResponseScreen, screenName, {
+        delay: randInt(AppSettings.delayLower, AppSettings.delayUpper),
+        stimulus: stimulus,
+        target: stimulus,
+        maxTypeTime: AppSettings.maxTypeTime,
+        appendResult: this.controller.createAppendResultFunction(resultsArray)
+      })
+    }
+  }
+
   addDemonstrationPhase(maxNumber: number, numTrials: number) {
-    this.addScreen(InstructionScreen, 'Demonstration', {
+    this.addScreen(InstructionScreen, 'inst_demonstration', {
       instructions: [`To familiarize with the program, you will be presented with 
-       ${AppSettings.numDemonstrationTrials} problems.`]
+       ${numTrials} addition/type problems.`]
     });
 
-    this.addScreen(InstructionScreen, 'Demonstration', {
-      instructions: [`Please be absolutely careful in this phase. Producing more than
-      ${AppSettings.allowedDemonstrationErrors} errors will terminate the experiment early.`]
-    });
+    // this.addScreen(InstructionScreen, 'Demonstration', {
+    //   instructions: [`Please be absolutely careful in this phase. Producing more than
+    //   ${AppSettings.allowedDemonstrationErrors} errors will terminate the experiment early.`]
+    // });
 
     for (let trial=0; trial < numTrials; trial++) {
       let stimulus = '';
@@ -111,25 +133,86 @@ class Experiment extends React.Component {
       })
     }
 
-    this.addScreen(RewardSummaryScreen, 'rewardSummary_demonstration', {
+    this.addScreen(RewardSummaryScreen, 'reward_demonstration', {
       resultsArray: this.controller.demonstrationResults
     });
   }
 
-  addCallibrationPhase(maxNumber: number, numSets: number) {
+  addCalibrationPhase(maxNumber: number, numSets: number) {
+    this.addScreen(InstructionScreen, 'inst_calibration', {
+      instructions: [`In this phase, you will be presented with 
+       ${AppSettings.numWarmupTrials + (numSets * (maxNumber+1))} type problems.`]
+    });
+
+    this.addWarmup('calibration',
+      this.controller.calibrationWarmupResults,
+      AppSettings.maxAddend,
+      AppSettings.numWarmupTrials);
+
     for (let set=0; set < numSets; set++) {
       let numbers = _.shuffle(_.range(0, maxNumber+1));
       for (let i=0; i < numbers.length; i++) {
         let num = numbers[i];
-        let screenName = `callibration_${set}_${num}`;
+        let screenName = `calibration_${set}_${num}`;
         this.addScreen(ResponseScreen, screenName, {
           delay: randInt(AppSettings.delayLower, AppSettings.delayUpper),
           stimulus: num.toString(),
           target: num.toString(),
           maxTypeTime: AppSettings.maxTypeTime,
-          appendResult: this.controller.createAppendResultFunction(this.controller.callibrationResults)
+          appendResult: this.controller.createAppendResultFunction(this.controller.calibrationResults)
         })
       }
+    }
+
+    this.addScreen(RewardSummaryScreen, 'reward_calibration', {
+      resultsArray: this.controller.calibrationResults,
+      warmupResultsArray: this.controller.calibrationWarmupResults
+    });
+  }
+
+  addAdd2Phase(maxNumber: number, numAdd2Split: number, numWarmupTrials: number) {
+    let stimuli = [];
+    let targets = [];
+    for (let i=0; i <= maxNumber; i++) {
+      for (let j=0; j <= maxNumber; j++) {
+        stimuli.push(i + '+' + j);
+        targets.push((i+j).toString());
+      }
+    }
+    let indices = _.shuffle(_.range(0, stimuli.length));
+    const chunkSize = Math.ceil(stimuli.length / numAdd2Split);
+    stimuli = _.chunk(_.at(stimuli, indices), chunkSize);
+    targets = _.chunk(_.at(targets, indices), chunkSize);
+
+    for (let set = 0; set < numAdd2Split; set++) {
+
+      let chunk_stimuli = stimuli[set];
+      let chunk_targets = targets[set];
+      this.addScreen(InstructionScreen, 'inst_calibration', {
+        instructions: [`In this phase, you will be presented with
+       ${AppSettings.numWarmupTrials} type problems and ${chunk_stimuli.length} addition problems.`]
+      });
+
+      this.addWarmup('add2_part' + set,
+        this.controller.warmupResults[set],
+        AppSettings.maxAddend,
+        AppSettings.numWarmupTrials);
+
+      for (let i=0; i < chunk_stimuli.length; i++) {
+        let screenName = 'add2_part' + set + '_' + i;
+        this.addScreen(ResponseScreen, screenName, {
+          delay: randInt(AppSettings.delayLower, AppSettings.delayUpper),
+          stimulus: chunk_stimuli[i],
+          target: chunk_targets[i],
+          maxTypeTime: AppSettings.maxTypeTime,
+          appendResult: this.controller.createAppendResultFunction(this.controller.add2Results[set])
+        })
+      }
+
+      this.addScreen(RewardSummaryScreen, 'reward_add2_' + set, {
+        resultsArray: this.controller.add2Results[set],
+        warmupResultsArray: this.controller.warmupResults[set]
+      });
     }
   }
 

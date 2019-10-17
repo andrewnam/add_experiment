@@ -1,0 +1,40 @@
+.maintext {
+    text-align: justify;
+    line-height: 1.5em;
+}
+
+.question {
+    padding: 8px;
+}
+
+.question-text {
+    text-align: left;
+    padding: 0px;
+}
+
+.question-response {
+    padding-left: 16px;
+    padding-bottom: 0;
+}
+
+.DemographicSurvey {
+    text-align: left;
+    background: aliceblue;
+}
+
+.inner {
+    padding: 20px;
+}
+
+.btn-container {
+    /*padding: 10px;*/
+    right: 22px;
+    bottom: -10px;
+    position: absolute;
+}
+
+.empty {
+    display: block;
+    width: 100%;
+    height: 36px;
+}

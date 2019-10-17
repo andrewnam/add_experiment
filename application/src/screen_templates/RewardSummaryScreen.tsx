@@ -7,6 +7,7 @@ import AppSettings from "../AppSettings";
 class RewardSummaryScreen extends Screen {
   props!: {
     resultsArray: Array<boolean>,
+    warmupResultsArray?: Array<boolean>,
     controller: Controller,
     screenName: string
   };
@@ -16,8 +17,14 @@ class RewardSummaryScreen extends Screen {
   }
 
   render() {
-    const correct = this.props.controller.getTotalCorrect(this.props.resultsArray);
-    const numProblems = this.props.resultsArray.length;
+    let correct = this.props.controller.getTotalCorrect(this.props.resultsArray);
+    let numProblems = this.props.resultsArray.length;
+
+    if (this.props.warmupResultsArray !== undefined) {
+      correct += this.props.controller.getTotalCorrect(this.props.warmupResultsArray);
+      numProblems += this.props.warmupResultsArray.length;
+    }
+
     const totalSolved = this.props.controller.getTotalCorrect();
     return <div>
 

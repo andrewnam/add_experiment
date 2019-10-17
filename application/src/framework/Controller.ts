@@ -4,6 +4,7 @@ const _ = require('lodash');
 
 interface ControllerFunctions {
   goToNextScreen: () => void;
+  getCurrentScreen: () => number;
 }
 
 class Controller {
@@ -11,7 +12,8 @@ class Controller {
   datastore: Datastore;
 
   demonstrationResults: Array<boolean>;
-  callibrationResults: Array<boolean>;
+  calibrationWarmupResults: Array<boolean>;
+  calibrationResults: Array<boolean>;
   warmupResults: Array<Array<boolean>>;
   add2Results: Array<Array<boolean>>;
 
@@ -21,7 +23,8 @@ class Controller {
     this.datastore = new Datastore();
 
     this.demonstrationResults = new Array<boolean>();
-    this.callibrationResults = new Array<boolean>();
+    this.calibrationResults = new Array<boolean>();
+    this.calibrationWarmupResults = new Array<boolean>();
     this.warmupResults = new Array<Array<boolean>>();
     this.add2Results = new Array<Array<boolean>>();
 
@@ -51,7 +54,8 @@ class Controller {
       }
     }
     return this.getTotalCorrect(this.demonstrationResults) +
-      this.getTotalCorrect(this.callibrationResults) +
+      this.getTotalCorrect(this.calibrationResults) +
+      this.getTotalCorrect(this.calibrationWarmupResults) +
       this.getTotalCorrect(this.warmupResults) +
       this.getTotalCorrect(this.add2Results)
   }
@@ -59,7 +63,8 @@ class Controller {
   getNumProblems(): number { // returns the total number of problems presented so far
     let total = 0;
     total += this.demonstrationResults.length;
-    total += this.callibrationResults.length;
+    total += this.calibrationResults.length;
+    total += this.calibrationWarmupResults.length;
 
     for (let i=0; i < this.add2Results.length; i++) {
       total += this.add2Results[i].length;

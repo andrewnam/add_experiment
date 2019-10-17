@@ -8,7 +8,7 @@ export const AppSettings = {
 
   numDemonstrationTrials: 5,
   allowedDemonstrationErrors: 2, // if they miss more than this, they are booted
-  numCallibrationSets: 3,
+  numCalibrationSets: 3,
   numWarmupTrials: 10,
   numAdd2Split: 3, // splits the add2 problems across n sets
 

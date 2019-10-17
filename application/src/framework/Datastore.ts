@@ -1,7 +1,8 @@
 export enum Datatype {
   ResponseTime = 'responseTime',
   Response = 'response',
-  Metadata = 'metadata'
+  Metadata = 'metadata',
+  SurveyResponse = 'surveyResponse'
 }
 
 export interface Datum {

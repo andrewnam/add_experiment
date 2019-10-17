@@ -18,11 +18,16 @@ export function timer(duration: number,
     } else {
       let speed = target_period / (timestamp - last_timestamp);
       target_period = period * speed;
-      Timeout.set(timestamp, tick, target_period);
+      Timeout.set(start, tick, target_period);
     }
   }
 
   Timeout.set(start, tick, target_period);
+  return start; // key to kill timer
+}
+
+export function clear_timer(key: number) {
+  Timeout.clear(key);
 }
 
 export function round(n: number, decimals: number) {
