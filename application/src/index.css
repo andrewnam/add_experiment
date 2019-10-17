@@ -31,3 +31,13 @@ code {
   transform: translate(-50%, -50%)
 }
 
+.text {
+  font-size: 28px;
+  text-align: justify;
+}
+
+.continue {
+  font-size: 28px;
+  color: blue;
+  margin-top: 36px;
+}
