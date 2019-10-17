@@ -8,17 +8,13 @@ import AppSettings from './AppSettings';
 import {randInt, toUSD} from "./utils";
 import RewardSummaryScreen from "./screen_templates/RewardSummaryScreen";
 import DemographicSurvey from "./screens/DemographicSurvey";
+import {getHitParams, HITParams} from "./service/psiturkService";
+import SubmitDataScreen from "./screens/SubmitDataScreen";
+import ExperimentCompleteScreen from "./screens/ExperimentCompleteScreen";
 const _ = require('lodash');
 
 
 class Experiment extends React.Component {
-  static assignmentIdParam = 'assignmentId';
-  static hitIdParam = 'hitId';
-  static workerIdParam = 'workerId';
-
-  // assignmentId: string;
-  // hitId: string;
-  // workerId: string;
 
   state: {
     current_screen: number,
@@ -33,8 +29,8 @@ class Experiment extends React.Component {
       current_screen: 0
     };
 
-    this.controller = new Controller({
-      goToNextScreen: this.goToNextScreen.bind(this),
+    this.controller = new Controller(getHitParams(),
+      {goToNextScreen: this.goToNextScreen.bind(this),
       getCurrentScreen: (() => this.state.current_screen).bind(this)
     });
     this.screens = [];
@@ -45,7 +41,9 @@ class Experiment extends React.Component {
     // this.addCalibrationPhase(AppSettings.maxAddend, AppSettings.numCalibrationSets);
     this.addCalibrationPhase(5, 1);
     this.addAdd2Phase(AppSettings.maxAddend, AppSettings.numAdd2Split, AppSettings.numWarmupTrials);
-    this.addScreen(DemographicSurvey, 'demographic_survey')
+    this.addScreen(DemographicSurvey, 'demographic_survey');
+    this.addScreen(SubmitDataScreen, 'submit_data');
+    this.addScreen(ExperimentCompleteScreen, 'experiment_complete');
   }
 
   addScreen(screen: ComponentClass<any>, screenName: string, props?: object) {
@@ -219,11 +217,10 @@ class Experiment extends React.Component {
   goToNextScreen() {
     this.setState((state: any) => {return {current_screen: state.current_screen + 1}},
       () => {
-        // this.recordNewScreen();
-        // // If the experiment is over:
-        // if (this.state.current_screen == this.screens.length - 1) {
-        //   emitHitComplete(this.onComplete);
-        // }
+        // If the experiment is over:
+        if (this.state.current_screen == this.screens.length - 1) {
+          emitHitComplete(this.onComplete);
+        }
       });
   }
 

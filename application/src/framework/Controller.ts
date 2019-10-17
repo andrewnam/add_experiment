@@ -1,5 +1,6 @@
 import Datastore from "./Datastore";
 import AppSettings from "../AppSettings";
+import {HITParams, post, submitHIT} from "../service/psiturkService";
 const _ = require('lodash');
 
 interface ControllerFunctions {
@@ -8,6 +9,7 @@ interface ControllerFunctions {
 }
 
 class Controller {
+  hitParams: HITParams;
   functions: ControllerFunctions;
   datastore: Datastore;
 
@@ -17,10 +19,12 @@ class Controller {
   warmupResults: Array<Array<boolean>>;
   add2Results: Array<Array<boolean>>;
 
-
-  constructor(functions: ControllerFunctions) {
+  startTime: Date;
+  constructor(hitParams: HITParams, functions: ControllerFunctions) {
+    this.hitParams = hitParams;
     this.functions = functions;
     this.datastore = new Datastore();
+    this.startTime = new Date();
 
     this.demonstrationResults = new Array<boolean>();
     this.calibrationResults = new Array<boolean>();
@@ -71,6 +75,32 @@ class Controller {
       total += this.warmupResults[i].length;
     }
     return total;
+  }
+
+  async sendData() {
+    const filename =  `${AppSettings.saveDirectory}/${this.hitParams.assignmentId}
+    _${this.hitParams.workerId}_${this.hitParams.hitId}`;
+
+    const data = {
+      'datastore': this.datastore.data,
+      'results': {
+        'demonstration': this.demonstrationResults,
+        'calibration_warmup': this.calibrationWarmupResults,
+        'calibration': this.calibrationResults,
+        'add2_warmup': this.warmupResults,
+        'add2': this.add2Results,
+        'total_correct': this.getTotalCorrect()
+      },
+      'app_settings': AppSettings,
+      'hit_params': this.hitParams,
+      'start': this.startTime,
+      'end': new Date()
+    };
+    await post(AppSettings.post_url, filename, data, True);
+  }
+
+  submitHIT() {
+    submitHIT(this.hitParams.onComplete);
   }
 }
 

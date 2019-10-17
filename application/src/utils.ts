@@ -1,6 +1,10 @@
 // import Timeout from 'smart-timeout';
 const Timeout = require('smart-timeout');
 
+export function sleep(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export function timer(duration: number,
                       period: number,
                       callback: () => void) {
