@@ -1,0 +1,53 @@
+.KeyboardSurvey {
+    background: aliceblue;
+    padding: 20px;
+}
+
+.maintext {
+    text-align: justify;
+    font-size: 24px;
+    line-height: 1.5em;
+    padding-bottom: 24px;
+}
+
+.numbar-radio-container {
+    text-align: left;
+    padding-top: 19px;
+}
+
+.numpad-radio-container {
+    text-align: left;
+    padding-top: 104px;
+}
+
+.other-radio-container {
+    text-align: left;
+}
+
+/*.image-container {*/
+    /*position: absolute;;*/
+    /*right: 0px;*/
+/*}*/
+
+.selection {
+    padding: 8px;
+    /*padding-top: 12px;*/
+    /*padding-bottom: 12px;*/
+}
+
+label {
+    font-size: 20px;
+}
+
+.bg1 {
+    /*background: aliceblue;*/
+}
+
+.bg2 {
+    /*background: lavender;*/
+}
+
+.btn-container {
+    text-align: right;
+    padding-top: 13px;
+}

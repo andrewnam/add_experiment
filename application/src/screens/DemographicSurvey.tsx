@@ -103,7 +103,7 @@ class DemographicSurvey extends Screen {
       <div className={"DemographicSurvey"}>
         <div className={'inner'}>
           <div className={'maintext'}>
-            This concludes the main body of the experiment. Before you exit, as is commonly done in experiments involving
+            Before you exit, as is commonly done in experiments involving
             human participants, we would like to collect some data about our sample population.
           </div>
           <br/>

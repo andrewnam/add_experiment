@@ -7,10 +7,11 @@ import InstructionScreen from "./screen_templates/InstructionScreen";
 import AppSettings from './AppSettings';
 import {randInt, toUSD} from "./utils";
 import RewardSummaryScreen from "./screen_templates/RewardSummaryScreen";
-// import DemographicSurvey from "./screens/DemographicSurvey";
+import DemographicSurvey from "./screens/DemographicSurvey";
 import {getHitParams} from "./service/psiturkService";
 import SubmitDataScreen from "./screens/SubmitDataScreen";
 import ExperimentCompleteScreen from "./screens/ExperimentCompleteScreen";
+import KeyboardSurvey from "./screens/KeyboardSurvey";
 const _ = require('lodash');
 
 
@@ -35,6 +36,7 @@ class Experiment extends React.Component {
     });
     this.screens = [];
 
+    this.addScreen(DemographicSurvey, 'demographic_survey');
 
     this.addInstructions();
     // this.addDemonstrationPhase(AppSettings.maxAddend, AppSettings.numDemonstrationTrials);
@@ -43,7 +45,8 @@ class Experiment extends React.Component {
     // this.addDemonstrationPhase(2, 2);
     // this.addCalibrationPhase(2, 1, 2);
     this.addAdd2Phase(2, 2, 2);
-    // this.addScreen(DemographicSurvey, 'demographic_survey');
+    this.addScreen(KeyboardSurvey, 'keyboard_survey');
+    this.addScreen(DemographicSurvey, 'demographic_survey');
     this.addScreen(SubmitDataScreen, 'submit_data');
     this.addScreen(ExperimentCompleteScreen, 'experiment_complete');
   }
@@ -76,12 +79,14 @@ class Experiment extends React.Component {
       instructions: [`You will receive ${toUSD(AppSettings.correctReward)} for each correct response and
        ${toUSD(AppSettings.incorrectReward)} for each incorrect response. There will be ${numTypeProblems} Type
        problems and ${numAddProblems} for a maximum compensation of
-       ${toUSD(totalProblems*AppSettings.correctReward)}.`]
+       ${toUSD(totalProblems*AppSettings.correctReward)}.`,
+        `You will receive ${AppSettings.numAdd2Split} breaks during the experiment.`]
     });
 
     this.addScreen(InstructionScreen, 'inst_details', {
-      instructions: [`Please response and type quickly. The program will proceed soon after the first entered key.
-       You will receive ${AppSettings.numAdd2Split} breaks during the experiment.`]
+      instructions: [`Please respond and type quickly and accuracy, especially when typing numbers with
+      multiple digits.
+      The program will only register a second keystroke if it is made immediately after the first.`]
     });
   }
 

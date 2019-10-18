@@ -1,6 +1,8 @@
 .maintext {
     text-align: justify;
+    font-size: 20px !important;
     line-height: 1.5em;
+    padding-bottom: 8px !important;
 }
 
 .question {
@@ -29,7 +31,7 @@
 .btn-container {
     /*padding: 10px;*/
     right: 22px;
-    bottom: -10px;
+    bottom: -34px;
     position: absolute;
 }
 
