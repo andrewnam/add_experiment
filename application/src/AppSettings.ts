@@ -1,6 +1,6 @@
 export const AppSettings = {
   post_url: "https://web.stanford.edu/~ajhnam/cgi-bin/post_endpoint.py",
-  saveDirectory: 'add2/test',
+  saveDirectory: 'add2/pilot1',
 
   maxTrialTime: 6000,
   maxTypeTime: 300,

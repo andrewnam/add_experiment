@@ -37,12 +37,12 @@ class Experiment extends React.Component {
     this.screens = [];
 
     this.addInstructions();
-    // this.addDemonstrationPhase(AppSettings.maxAddend, AppSettings.numDemonstrationTrials);
-    // this.addCalibrationPhase(AppSettings.maxAddend, AppSettings.numCalibrationSets);
-    // this.addAdd2Phase(AppSettings.maxAddend, AppSettings.numAdd2Split, AppSettings.numWarmupTrials);
-    this.addDemonstrationPhase(2, 2);
-    this.addCalibrationPhase(2, 1, 2);
-    this.addAdd2Phase(2, 2, 2);
+    this.addDemonstrationPhase(AppSettings.maxAddend, AppSettings.numDemonstrationTrials);
+    this.addCalibrationPhase(AppSettings.maxAddend, AppSettings.numCalibrationSets, AppSettings.numWarmupTrials);
+    this.addAdd2Phase(AppSettings.maxAddend, AppSettings.numAdd2Split, AppSettings.numWarmupTrials);
+    // this.addDemonstrationPhase(2, 2);
+    // this.addCalibrationPhase(2, 1, 2);
+    // this.addAdd2Phase(2, 2, 2);
     this.addScreen(KeyboardSurvey, 'keyboard_survey');
     this.addScreen(DemographicSurvey, 'demographic_survey');
     this.addScreen(SubmitDataScreen, 'submit_data');
