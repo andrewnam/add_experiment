@@ -7,8 +7,8 @@ import InstructionScreen from "./screen_templates/InstructionScreen";
 import AppSettings from './AppSettings';
 import {randInt, toUSD} from "./utils";
 import RewardSummaryScreen from "./screen_templates/RewardSummaryScreen";
-import DemographicSurvey from "./screens/DemographicSurvey";
-import {getHitParams, HITParams} from "./service/psiturkService";
+// import DemographicSurvey from "./screens/DemographicSurvey";
+import {getHitParams} from "./service/psiturkService";
 import SubmitDataScreen from "./screens/SubmitDataScreen";
 import ExperimentCompleteScreen from "./screens/ExperimentCompleteScreen";
 const _ = require('lodash');
@@ -37,11 +37,13 @@ class Experiment extends React.Component {
 
 
     this.addInstructions();
-    this.addDemonstrationPhase(AppSettings.maxAddend, AppSettings.numDemonstrationTrials);
+    // this.addDemonstrationPhase(AppSettings.maxAddend, AppSettings.numDemonstrationTrials);
     // this.addCalibrationPhase(AppSettings.maxAddend, AppSettings.numCalibrationSets);
-    this.addCalibrationPhase(5, 1);
-    this.addAdd2Phase(AppSettings.maxAddend, AppSettings.numAdd2Split, AppSettings.numWarmupTrials);
-    this.addScreen(DemographicSurvey, 'demographic_survey');
+    // this.addAdd2Phase(AppSettings.maxAddend, AppSettings.numAdd2Split, AppSettings.numWarmupTrials);
+    // this.addDemonstrationPhase(2, 2);
+    // this.addCalibrationPhase(2, 1, 2);
+    this.addAdd2Phase(2, 2, 2);
+    // this.addScreen(DemographicSurvey, 'demographic_survey');
     this.addScreen(SubmitDataScreen, 'submit_data');
     this.addScreen(ExperimentCompleteScreen, 'experiment_complete');
   }
@@ -136,16 +138,14 @@ class Experiment extends React.Component {
     });
   }
 
-  addCalibrationPhase(maxNumber: number, numSets: number) {
+  addCalibrationPhase(maxNumber: number, numSets: number, numWarmupTrials: number) {
     this.addScreen(InstructionScreen, 'inst_calibration', {
       instructions: [`In this phase, you will be presented with 
-       ${AppSettings.numWarmupTrials + (numSets * (maxNumber+1))} type problems.`]
+       ${numWarmupTrials + (numSets * (maxNumber+1))} type problems.`]
     });
 
     this.addWarmup('calibration',
-      this.controller.calibrationWarmupResults,
-      AppSettings.maxAddend,
-      AppSettings.numWarmupTrials);
+      this.controller.calibrationWarmupResults, maxNumber, numWarmupTrials);
 
     for (let set=0; set < numSets; set++) {
       let numbers = _.shuffle(_.range(0, maxNumber+1));
@@ -188,13 +188,11 @@ class Experiment extends React.Component {
       let chunk_targets = targets[set];
       this.addScreen(InstructionScreen, 'inst_calibration', {
         instructions: [`In this phase, you will be presented with
-       ${AppSettings.numWarmupTrials} type problems and ${chunk_stimuli.length} addition problems.`]
+       ${numWarmupTrials} type problems and ${chunk_stimuli.length} addition problems.`]
       });
 
       this.addWarmup('add2_part' + set,
-        this.controller.warmupResults[set],
-        AppSettings.maxAddend,
-        AppSettings.numWarmupTrials);
+        this.controller.warmupResults[set], maxNumber, numWarmupTrials);
 
       for (let i=0; i < chunk_stimuli.length; i++) {
         let screenName = 'add2_part' + set + '_' + i;
@@ -219,7 +217,7 @@ class Experiment extends React.Component {
       () => {
         // If the experiment is over:
         if (this.state.current_screen == this.screens.length - 1) {
-          emitHitComplete(this.onComplete);
+          // emitHitComplete(this.onComplete);
         }
       });
   }

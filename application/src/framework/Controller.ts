@@ -78,8 +78,7 @@ class Controller {
   }
 
   async sendData() {
-    const filename =  `${AppSettings.saveDirectory}/${this.hitParams.assignmentId}
-    _${this.hitParams.workerId}_${this.hitParams.hitId}`;
+    const filename =  `${AppSettings.saveDirectory}/${this.hitParams.assignmentId}_${this.hitParams.workerId}_${this.hitParams.hitId}`;
 
     const data = {
       'datastore': this.datastore.data,
@@ -96,7 +95,7 @@ class Controller {
       'start': this.startTime,
       'end': new Date()
     };
-    await post(AppSettings.post_url, filename, data, True);
+    await post(AppSettings.post_url, filename, data, true);
   }
 
   submitHIT() {
