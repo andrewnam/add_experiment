@@ -1,5 +1,5 @@
 [HIT Configuration]
-title = Addition Task (~30 minutes)
+title = Addition Task ($5 for 30~40 minutes)
 description = A response time study for mental addition.
 amt_keywords = Psychology, response time, cognitive, arithmetic, mathematics, addition
 lifetime = 24
