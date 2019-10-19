@@ -25,15 +25,26 @@ class RewardSummaryScreen extends Screen {
       numProblems += this.props.warmupResultsArray.length;
     }
 
-    const totalSolved = this.props.controller.getTotalCorrect();
-    return <div>
 
+    const totalCorrect = this.props.controller.getTotalCorrect();
+    const totalProblems = this.props.controller.getNumProblems();
+    const incorrect = numProblems - correct;
+    const totalIncorrect = totalProblems - totalCorrect;
+    const reward = correct*AppSettings.correctReward;
+    const penalty = incorrect*AppSettings.incorrectPenalty;
+    const netEarnings =  reward - penalty;
+    const totalReward = totalCorrect*AppSettings.correctReward;
+    const totalPenalty = totalIncorrect*AppSettings.incorrectPenalty;
+    const totalNetEarnings = totalReward - totalPenalty;
+
+
+    return <div>
       <div className={'text'}>
-        You solved {correct} problems out of {numProblems} in this phase,
-        earning {toUSD(correct*AppSettings.correctReward)}!
+        You solved {correct} problems and missed {incorrect} problems this phase,
+        earning {toUSD(reward)} - {toUSD(penalty)} = {toUSD(netEarnings)}.
         <br/><br/>
-        Overall, you solved {totalSolved} out of {this.props.controller.getNumProblems()} problems for a
-        total of {toUSD(totalSolved*AppSettings.correctReward)}.
+        Overall, you solved {totalCorrect} problems and missed {totalIncorrect} problems for a
+        total of {toUSD(totalReward)} - {toUSD(totalPenalty)} = {toUSD(totalNetEarnings)}.
       </div>
       <div className={'continue'}>
         Press any key to continue.

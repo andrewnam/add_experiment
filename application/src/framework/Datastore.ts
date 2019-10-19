@@ -1,5 +1,6 @@
 export enum Datatype {
   ResponseTime = 'responseTime',
+  TaskDetail = 'taskDetail',
   Response = 'response',
   Metadata = 'metadata',
   SurveyResponse = 'surveyResponse'

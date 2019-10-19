@@ -78,7 +78,21 @@ class ResponseScreen extends Screen {
 
     this.props.controller.datastore.append({
       screenName: this.props.screenName,
-      type: Datatype.Metadata,
+      type: Datatype.TaskDetail,
+      key: 'stimulus',
+      value: this.props.stimulus
+    });
+
+    this.props.controller.datastore.append({
+      screenName: this.props.screenName,
+      type: Datatype.TaskDetail,
+      key: 'target',
+      value: this.props.target
+    });
+
+    this.props.controller.datastore.append({
+      screenName: this.props.screenName,
+      type: Datatype.TaskDetail,
       key: 'delay',
       value: this.props.delay
     });

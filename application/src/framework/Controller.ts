@@ -64,17 +64,31 @@ class Controller {
       this.getTotalCorrect(this.add2Results)
   }
 
-  getNumProblems(): number { // returns the total number of problems presented so far
-    let total = 0;
-    total += this.demonstrationResults.length;
-    total += this.calibrationResults.length;
-    total += this.calibrationWarmupResults.length;
-
-    for (let i=0; i < this.add2Results.length; i++) {
-      total += this.add2Results[i].length;
-      total += this.warmupResults[i].length;
+  getNumProblems(resultsArray?: Array<boolean> | Array<Array<boolean>>): number {
+    if (resultsArray !== undefined) {
+      if (typeof resultsArray[0] == "boolean") {
+        return resultsArray.length;
+      } else {
+        let length = 0;
+        for (let i=0; i<resultsArray.length; i++) {
+          length += (resultsArray[i] as Array<boolean>).length;
+        }
+        return length;
+      }
     }
-    return total;
+    return this.getNumProblems(this.demonstrationResults) +
+      this.getNumProblems(this.calibrationResults) +
+      this.getNumProblems(this.calibrationWarmupResults) +
+      this.getNumProblems(this.warmupResults) +
+      this.getNumProblems(this.add2Results)
+  }
+
+  addSummaryStatistics(summary: object, prefix: string, resultsArray?: Array<boolean> | Array<Array<boolean>>) {
+    const numProblems = this.getNumProblems(resultsArray);
+    const correct = this.getTotalCorrect(resultsArray);
+    summary[prefix + '_' + 'problems'] = numProblems;
+    summary[prefix + '_' + 'correct'] = correct;
+    summary[prefix + '_' + 'incorrect'] = numProblems - correct;
   }
 
   async sendData() {
@@ -88,13 +102,26 @@ class Controller {
         'calibration': this.calibrationResults,
         'add2_warmup': this.warmupResults,
         'add2': this.add2Results,
-        'total_correct': this.getTotalCorrect()
+
       },
+      'summary': {},
       'app_settings': AppSettings,
       'hit_params': this.hitParams,
       'start': this.startTime,
       'end': new Date()
     };
+
+    this.addSummaryStatistics(data['summary'], 'total');
+    this.addSummaryStatistics(data['summary'], 'demonstration', this.demonstrationResults);
+    this.addSummaryStatistics(data['summary'], 'calibration_warmup', this.calibrationWarmupResults);
+    this.addSummaryStatistics(data['summary'], 'calibration', this.calibrationResults);
+    this.addSummaryStatistics(data['summary'], 'add2_warmup', this.warmupResults);
+    this.addSummaryStatistics(data['summary'], 'add2', this.add2Results);
+    for (let i=0; i<this.add2Results.length; i++) {
+      this.addSummaryStatistics(data['summary'], 'add2_warmup_' + i, this.warmupResults[i]);
+      this.addSummaryStatistics(data['summary'], 'add2_' + i, this.add2Results[i]);
+    }
+
     await post(AppSettings.post_url, filename, data, true);
   }
 

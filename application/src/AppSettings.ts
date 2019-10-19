@@ -1,6 +1,6 @@
 export const AppSettings = {
   post_url: "https://web.stanford.edu/~ajhnam/cgi-bin/post_endpoint.py",
-  saveDirectory: 'add2/pilot1',
+  saveDirectory: 'add2/pilot2',
 
   maxTrialTime: 6000,
   maxTypeTime: 300,
@@ -15,7 +15,7 @@ export const AppSettings = {
   numAdd2Split: 3, // splits the add2 problems across n sets
 
   correctReward: .01,
-  incorrectReward: 0
+  incorrectPenalty: .01
 };
 
 export default AppSettings

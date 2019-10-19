@@ -74,15 +74,15 @@ class Experiment extends React.Component {
     const totalProblems = numTypeProblems + numAddProblems;
 
     this.addScreen(InstructionScreen, 'inst_compensation', {
-      instructions: [`You will receive ${toUSD(AppSettings.correctReward)} for each correct response and
-       ${toUSD(AppSettings.incorrectReward)} for each incorrect response. There will be ${numTypeProblems} Type
+      instructions: [`You will earn ${toUSD(AppSettings.correctReward)} for each correct response and
+       lose ${toUSD(AppSettings.incorrectPenalty)} for each incorrect response. There will be ${numTypeProblems} Type
        problems and ${numAddProblems} for a maximum compensation of
        ${toUSD(totalProblems*AppSettings.correctReward)}.`,
         `You will receive ${AppSettings.numAdd2Split} breaks during the experiment.`]
     });
 
     this.addScreen(InstructionScreen, 'inst_details', {
-      instructions: [`Please respond and type quickly and accuracy, especially when typing numbers with
+      instructions: [`Please respond and type quickly and accurately, especially when typing numbers with
       multiple digits.
       The program will only register a second keystroke if it is made immediately after the first.`]
     });
