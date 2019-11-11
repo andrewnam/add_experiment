@@ -91,7 +91,7 @@ class DemographicSurvey extends Screen {
           screenName: this.props.screenName,
           type: Datatype.SurveyResponse,
           key: DemographicSurvey.mathKey,
-          value: this.state.mathEducation[i]
+          value: this.state.mathEducation[i]['label']
         })
       }
     }
