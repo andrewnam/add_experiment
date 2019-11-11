@@ -38,11 +38,8 @@ class Experiment extends React.Component {
 
     this.addInstructions();
     this.addDemonstrationPhase(AppSettings.maxAddend, AppSettings.numDemonstrationTrials);
-    this.addCalibrationPhase(AppSettings.maxAddend, AppSettings.numCalibrationSets, AppSettings.numWarmupTrials);
+    this.addCalibrationPhase(AppSettings.maxAddend*2, AppSettings.numCalibrationSets, AppSettings.numWarmupTrials);
     this.addAdd2Phase(AppSettings.maxAddend, AppSettings.numAdd2Split, AppSettings.numWarmupTrials);
-    // this.addDemonstrationPhase(2, 2);
-    // this.addCalibrationPhase(2, 1, 2);
-    // this.addAdd2Phase(2, 2, 2);
     this.addScreen(KeyboardSurvey, 'keyboard_survey');
     this.addScreen(DemographicSurvey, 'demographic_survey');
     this.addScreen(SubmitDataScreen, 'submit_data');
@@ -62,21 +59,21 @@ class Experiment extends React.Component {
 
   addInstructions() {
     this.addScreen(InstructionScreen, 'inst_welcome', {
-      instructions: ['In this experiment, you will be shown a series of numbers and simple math problems.' +
+      instructions: ['In this experiment, you will be shown a series of simple math problems.' +
         ' Please type the value of the expression shown.',
         'For example, if the screen shows 7, enter 7. If the screen shows 3 + 13, enter 16.']
     });
 
     const numAddProblems = (1+AppSettings.maxAddend) * (1+AppSettings.maxAddend);
     const numTypeProblems = AppSettings.numDemonstrationTrials +
-      (AppSettings.maxAddend+1)*AppSettings.numCalibrationSets +
+      (AppSettings.maxAddend*2 + 1)*AppSettings.numCalibrationSets +
       AppSettings.numWarmupTrials*(1+AppSettings.numAdd2Split);
     const totalProblems = numTypeProblems + numAddProblems;
 
     this.addScreen(InstructionScreen, 'inst_compensation', {
       instructions: [`You will earn ${toUSD(AppSettings.correctReward)} for each correct response and
-       lose ${toUSD(AppSettings.incorrectPenalty)} for each incorrect response. There will be ${numTypeProblems} Type
-       problems and ${numAddProblems} for a maximum compensation of
+       lose ${toUSD(AppSettings.incorrectPenalty)} for each incorrect response. There will be ${numTypeProblems} number
+       problems and ${numAddProblems} addition problems for a maximum compensation of
        ${toUSD(totalProblems*AppSettings.correctReward)}.`,
         `You will receive ${AppSettings.numAdd2Split} breaks during the experiment.`]
     });
@@ -104,14 +101,8 @@ class Experiment extends React.Component {
 
   addDemonstrationPhase(maxNumber: number, numTrials: number) {
     this.addScreen(InstructionScreen, 'inst_demonstration', {
-      instructions: [`To familiarize with the program, you will be presented with 
-       ${numTrials} addition/type problems.`]
+      instructions: [`To familiarize with the program, you will be presented with ${numTrials} problems.`]
     });
-
-    // this.addScreen(InstructionScreen, 'Demonstration', {
-    //   instructions: [`Please be absolutely careful in this phase. Producing more than
-    //   ${AppSettings.allowedDemonstrationErrors} errors will terminate the experiment early.`]
-    // });
 
     for (let trial=0; trial < numTrials; trial++) {
       let stimulus = '';
@@ -144,7 +135,7 @@ class Experiment extends React.Component {
   addCalibrationPhase(maxNumber: number, numSets: number, numWarmupTrials: number) {
     this.addScreen(InstructionScreen, 'inst_calibration', {
       instructions: [`In this phase, you will be presented with 
-       ${numWarmupTrials + (numSets * (maxNumber+1))} type problems.`]
+       ${numWarmupTrials + (numSets * (maxNumber+1))} number problems.`]
     });
 
     this.addWarmup('calibration',
@@ -191,7 +182,7 @@ class Experiment extends React.Component {
       let chunk_targets = targets[set];
       this.addScreen(InstructionScreen, 'inst_calibration', {
         instructions: [`In this phase, you will be presented with
-       ${numWarmupTrials} type problems and ${chunk_stimuli.length} addition problems.`]
+       ${numWarmupTrials} number problems and ${chunk_stimuli.length} addition problems.`]
       });
 
       this.addWarmup('add2_part' + set,
@@ -216,13 +207,7 @@ class Experiment extends React.Component {
   }
 
   goToNextScreen() {
-    this.setState((state: any) => {return {current_screen: state.current_screen + 1}},
-      () => {
-        // If the experiment is over:
-        if (this.state.current_screen == this.screens.length - 1) {
-          // emitHitComplete(this.onComplete);
-        }
-      });
+    this.setState((state: any) => {return {current_screen: state.current_screen + 1}});
   }
 
   renderScreen() {
