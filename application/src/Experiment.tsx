@@ -5,7 +5,7 @@ import Controller from "./framework/Controller";
 import {ComponentClass} from "react";
 import InstructionScreen from "./screen_templates/InstructionScreen";
 import AppSettings from './AppSettings';
-import {randInt, toUSD} from "./utils";
+import {neighborConsistentShuffle, randInt, toUSD} from "./utils";
 import RewardSummaryScreen from "./screen_templates/RewardSummaryScreen";
 import DemographicSurvey from "./screens/DemographicSurvey";
 import {getHitParams} from "./service/psiturkService";
@@ -142,7 +142,8 @@ class Experiment extends React.Component {
       this.controller.calibrationWarmupResults, maxNumber, numWarmupTrials);
 
     for (let set=0; set < numSets; set++) {
-      let numbers = _.shuffle(_.range(0, maxNumber+1));
+      let numbers = _.range(0, maxNumber+1);
+      numbers = neighborConsistentShuffle(numbers, (x: any, y: any) => x != y); // ensures no consecutive same numbers
       for (let i=0; i < numbers.length; i++) {
         let num = numbers[i];
         let screenName = `calibration_${set}_${num}`;
@@ -164,14 +165,15 @@ class Experiment extends React.Component {
 
   addAdd2Phase(maxNumber: number, numAdd2Split: number, numWarmupTrials: number) {
     let stimuli = [];
-    let targets = [];
+    let targets: Array<any> = [];
     for (let i=0; i <= maxNumber; i++) {
       for (let j=0; j <= maxNumber; j++) {
         stimuli.push(i + '+' + j);
         targets.push((i+j).toString());
       }
     }
-    let indices = _.shuffle(_.range(0, stimuli.length));
+    let indices = _.range(0, stimuli.length);
+    indices = neighborConsistentShuffle(indices, (x: any, y: any) => targets[x] != targets[y]);
     const chunkSize = Math.ceil(stimuli.length / numAdd2Split);
     stimuli = _.chunk(_.at(stimuli, indices), chunkSize);
     targets = _.chunk(_.at(targets, indices), chunkSize);

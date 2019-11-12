@@ -1,4 +1,4 @@
-// import Timeout from 'smart-timeout';
+const _ = require('lodash');
 const Timeout = require('smart-timeout');
 
 export function sleep(ms: number) {
@@ -55,6 +55,13 @@ export function toUSD(n: number) {
 }
 
 /*
+
+ */
+export function outer(a: Array<any>, b: Array<any>) {
+  return _.flatten(_.map(a, (i: any) => _.map(b, (j: any) => [i, j])));
+}
+
+/*
 Generates a random integer between [a, b] inclusive if b is provided.
 If b is not provided, generates a random integer between [0, a] inclusive.
  */
@@ -65,3 +72,35 @@ export function randInt(a: number, b?: number) {
     return Math.floor(Math.random() * (a + 1));
   }
 }
+
+/*
+Shuffles an array such that f(a[i], a[i+1) is always preserved
+f must be that commutative: i.e. f(a, b) == f(b, a)
+May return a local minimum
+Runtime: O(n^2)
+ */
+export function neighborConsistentShuffle(a: Array<any>, f: (x: any, y: any) => boolean) {
+  a = _.shuffle(a);
+  for (let i=0; i < a.length - 1; i++) {
+    if (!f(a[i], a[i+1])) {
+      if (f(a[i+1], a[i])) {
+        throw new Error(`f is not commutative: f(${a[i]}, ${a[i+1]}) != f(${a[i+1]}, ${a[i]})`)
+      }
+      let indices = _.shuffle(_.range(a.length));
+      for (let j=0; j < indices.length; j++) {
+        let i2 = indices[j];
+        let e1 = a[i];
+        let e2 = a[i2];
+        let consistent1 = (i == 0 || f(a[i-1], e2)) && (i == a.length-1 || f(e2, a[i+1]));
+        let consistent2 = (i2 == 0 || f(a[i2-1], e1)) && (i2 == a.length-1 || f(e1, a[i2+1]));
+        if (consistent1 && consistent2) {
+          a[i] = e2;
+          a[i2] = e1;
+          break;
+        }
+      }
+    }
+  }
+  return a;
+}
+
