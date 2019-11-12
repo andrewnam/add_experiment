@@ -6,8 +6,8 @@ export function sleep(ms: number) {
 }
 
 export function timer(duration: number,
-                      period: number,
                       callback: () => void) {
+  let period = 25; // just a default, can change but works fine in practice
   let start = Date.now();
   let last_timestamp = start;
   let target_period = period;
@@ -55,10 +55,30 @@ export function toUSD(n: number) {
 }
 
 /*
+Takes an object and returns a new object with key-value pairs that satisfy condition
+ */
+export function where(o: Object, condition: (key: any, value: any) => boolean) {
+  const obj = {}
+  const keys = _.keys(o);
+  for (let i=0; i < keys.length; i++) {
+    let k = keys[i];
+    let v = o[k];
+    if (condition(k, v)) {
+      obj[k] = v;
+    }
+  }
+  return obj;
+}
 
+/*
+Returns an array with every permutation of items in a and b
  */
 export function outer(a: Array<any>, b: Array<any>) {
   return _.flatten(_.map(a, (i: any) => _.map(b, (j: any) => [i, j])));
+}
+
+export function hasDuplicates(a: Array<any>) {
+  return (new Set(a)).size !== a.length;
 }
 
 /*

@@ -9,14 +9,23 @@ class Screen extends React.Component {
   };
 
   boundKeyDown: (event: any) => void;
+  inputCounter: number;
 
   constructor(props: any) {
     super(props);
     this.boundKeyDown = this.keyDown.bind(this);
+    this.inputCounter = 1;
   }
 
   // Overload to use.
-  handleKeyDown(key: string) {}
+  handleKeyDown(key: string) {
+    this.props.controller.datastore.append({
+      screenName: this.props.screenName,
+      type: Datatype.KeyPress,
+      key: `input${this.inputCounter++}`,
+      value: key
+    });
+  }
 
   keyDown(event: any) {
     let { key } = event;

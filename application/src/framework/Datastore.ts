@@ -1,5 +1,5 @@
 export enum Datatype {
-  ResponseTime = 'responseTime',
+  KeyPress = 'keyPress',
   TaskDetail = 'taskDetail',
   Response = 'response',
   Metadata = 'metadata',
@@ -10,7 +10,8 @@ export interface Datum {
   screenName: string,
   type: Datatype,
   key: string,
-  value: string | Date | number
+  value: string | Date | number,
+  timestamp?: Date
 }
 
 class Datastore {
@@ -21,9 +22,9 @@ class Datastore {
   }
 
   append(datum: Datum) {
+    datum.timestamp = new Date();
     this.data.push(datum);
   }
 }
-// export {Datastore, Datum}
 
 export default Datastore

@@ -1,17 +1,20 @@
 import * as React from 'react';
+import {ComponentClass} from 'react';
 import './Experiment.css';
 import ResponseScreen from "./screen_templates/ResponseScreen";
 import Controller from "./framework/Controller";
-import {ComponentClass} from "react";
 import InstructionScreen from "./screen_templates/InstructionScreen";
 import AppSettings from './AppSettings';
-import {neighborConsistentShuffle, randInt, toUSD} from "./utils";
+import {hasDuplicates, neighborConsistentShuffle, randInt, toUSD, where} from "./utils";
 import RewardSummaryScreen from "./screen_templates/RewardSummaryScreen";
 import DemographicSurvey from "./screens/DemographicSurvey";
 import {getHitParams} from "./service/psiturkService";
 import SubmitDataScreen from "./screens/SubmitDataScreen";
 import ExperimentCompleteScreen from "./screens/ExperimentCompleteScreen";
 import KeyboardSurvey from "./screens/KeyboardSurvey";
+import {Datatype} from "./framework/Datastore";
+import ITIScreen from "./screen_templates/ITIScreen";
+
 const _ = require('lodash');
 
 
@@ -35,7 +38,6 @@ class Experiment extends React.Component {
       getCurrentScreen: (() => this.state.current_screen).bind(this)
     });
     this.screens = [];
-
     this.addInstructions();
     this.addDemonstrationPhase(AppSettings.maxAddend, AppSettings.numDemonstrationTrials);
     this.addCalibrationPhase(AppSettings.maxAddend*2, AppSettings.numCalibrationSets, AppSettings.numWarmupTrials);
@@ -44,6 +46,29 @@ class Experiment extends React.Component {
     this.addScreen(DemographicSurvey, 'demographic_survey');
     this.addScreen(SubmitDataScreen, 'submit_data');
     this.addScreen(ExperimentCompleteScreen, 'experiment_complete');
+
+    for (let i=0; i < this.screens.length-1; i++) {
+      this.controller.datastore.append({
+        screenName: this.screens[i].props.screenName,
+        type: Datatype.Metadata,
+        key: 'nextScreenName',
+        value: this.screens[i+1].props.screenName
+      })
+    }
+
+    this.QACheck();
+  }
+
+  /*
+  Make sure I didn't do something dumb by accident.
+   */
+  QACheck() {
+    // Just a check to make sure no two screens share the same name
+    const screenNames = _.map(this.screens, (s: any) => s.props.screenName);
+    if (hasDuplicates(screenNames)) {
+      console.log(where(_.countBy(screenNames), (k, v) => v > 1));
+      throw new Error("QA check: no two screens should have the same name");
+    }
   }
 
   addScreen(screen: ComponentClass<any>, screenName: string, props?: object) {
@@ -85,12 +110,16 @@ class Experiment extends React.Component {
     });
   }
 
+  /*
+  Note that warmups do not have an end ITI
+   */
   addWarmup(phase: string, resultsArray: Array<boolean>, maxNumber: number, numTrials: number) {
     for (let i = 0; i < numTrials; i++) {
       let screenName = phase + '_warmup_' + i;
       let stimulus = randInt(maxNumber).toString();
+      this.addScreen(ITIScreen,  phase + '_warmup_ITI_' + i,
+        {duration: randInt(AppSettings.delayLower, AppSettings.delayUpper)});
       this.addScreen(ResponseScreen, screenName, {
-        delay: randInt(AppSettings.delayLower, AppSettings.delayUpper),
         stimulus: stimulus,
         target: stimulus,
         maxTypeTime: AppSettings.maxTypeTime,
@@ -118,6 +147,8 @@ class Experiment extends React.Component {
       }
 
       let screenName = `demonstration_${trial}`;
+      this.addScreen(ITIScreen, 'demo_ITI_' + trial,
+        {duration: randInt(AppSettings.delayLower, AppSettings.delayUpper)});
       this.addScreen(ResponseScreen, screenName, {
         delay: randInt(AppSettings.delayLower, AppSettings.delayUpper),
         stimulus: stimulus.toString(),
@@ -127,6 +158,8 @@ class Experiment extends React.Component {
       })
     }
 
+    this.addScreen(ITIScreen, 'demo_ITI_end',
+      {duration: randInt(AppSettings.delayLower, AppSettings.delayUpper)});
     this.addScreen(RewardSummaryScreen, 'reward_demonstration', {
       resultsArray: this.controller.demonstrationResults
     });
@@ -147,8 +180,9 @@ class Experiment extends React.Component {
       for (let i=0; i < numbers.length; i++) {
         let num = numbers[i];
         let screenName = `calibration_${set}_${num}`;
+        this.addScreen(ITIScreen, `calibration_ITI_${set}_${num}`,
+          {duration: randInt(AppSettings.delayLower, AppSettings.delayUpper)});
         this.addScreen(ResponseScreen, screenName, {
-          delay: randInt(AppSettings.delayLower, AppSettings.delayUpper),
           stimulus: num.toString(),
           target: num.toString(),
           maxTypeTime: AppSettings.maxTypeTime,
@@ -157,6 +191,8 @@ class Experiment extends React.Component {
       }
     }
 
+    this.addScreen(ITIScreen, 'calibration_ITI_end',
+      {duration: randInt(AppSettings.delayLower, AppSettings.delayUpper)});
     this.addScreen(RewardSummaryScreen, 'reward_calibration', {
       resultsArray: this.controller.calibrationResults,
       warmupResultsArray: this.controller.calibrationWarmupResults
@@ -182,7 +218,7 @@ class Experiment extends React.Component {
 
       let chunk_stimuli = stimuli[set];
       let chunk_targets = targets[set];
-      this.addScreen(InstructionScreen, 'inst_calibration', {
+      this.addScreen(InstructionScreen, `inst_add2_${set}`, {
         instructions: [`In this phase, you will be presented with
        ${numWarmupTrials} number problems and ${chunk_stimuli.length} addition problems.`]
       });
@@ -192,6 +228,8 @@ class Experiment extends React.Component {
 
       for (let i=0; i < chunk_stimuli.length; i++) {
         let screenName = 'add2_part' + set + '_' + i;
+        this.addScreen(ITIScreen, 'add2_part' + set + '_ITI_' + i,
+          {duration: randInt(AppSettings.delayLower, AppSettings.delayUpper)});
         this.addScreen(ResponseScreen, screenName, {
           delay: randInt(AppSettings.delayLower, AppSettings.delayUpper),
           stimulus: chunk_stimuli[i],
@@ -201,6 +239,8 @@ class Experiment extends React.Component {
         })
       }
 
+      this.addScreen(ITIScreen, 'add2_part' + set + '_ITI_end',
+        {duration: randInt(AppSettings.delayLower, AppSettings.delayUpper)});
       this.addScreen(RewardSummaryScreen, 'reward_add2_' + set, {
         resultsArray: this.controller.add2Results[set],
         warmupResultsArray: this.controller.warmupResults[set]

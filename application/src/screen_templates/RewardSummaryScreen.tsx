@@ -13,6 +13,7 @@ class RewardSummaryScreen extends Screen {
   };
 
   handleKeyDown(key: string) {
+    super.handleKeyDown(key);
     this.props.controller.functions.goToNextScreen();
   }
 

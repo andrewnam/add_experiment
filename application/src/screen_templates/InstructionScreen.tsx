@@ -10,6 +10,7 @@ class InstructionScreen extends Screen {
   };
 
   handleKeyDown(key: string) {
+    super.handleKeyDown(key);
     this.props.controller.functions.goToNextScreen();
   }
 
@@ -22,7 +23,7 @@ class InstructionScreen extends Screen {
     if (Array.isArray(instructions)) {
       for (let i=0; i<instructions.length; i++) {
         if (typeof instructions[i] == 'string') {
-          instructionElements.push(<div className={'text'}>{instructions[i]}</div>)
+          instructionElements.push(<div className={'text'} key={i}>{instructions[i]}</div>)
         } else {
           instructionElements.push(<div key={i}>{instructions[i]}</div>)
         }
